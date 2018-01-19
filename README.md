@@ -47,3 +47,4 @@ optional arguments:
 - The default interval for refresh is 1 second
 - The Process List's minimum refresh interval is 5 seconds in order to avoid overloading ProxySQL Admin
 
+![alt text](http://www.proxysql.com/assets/images/proxytop-sample.png)
