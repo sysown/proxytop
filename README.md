@@ -7,6 +7,8 @@ high availability, protocol aware proxy for MySQL and forks (like Percona Server
 ### How to install:
 
 ```
+## You may first need to install system Python and MySQL dev packages 
+## e.g. "sudo apt install python-dev libmysqlclient-dev"
 pip install MySQL-python npyscreen
 wget -P /usr/bin https://raw.githubusercontent.com/sysown/proxytop/master/proxytop
 ```
