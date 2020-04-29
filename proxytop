@@ -521,10 +521,13 @@ class ExitButton(npyscreen.ButtonPress):
 
 class MainApp(npyscreen.NPSAppManaged):
     keypress_timeout_default = 10
-    def onStart(self):
+    def __init__(self):
+        super(MainApp, self).__init__()
         DB_CS = get_params()
-        title_bar = 'ProxyTop - Realtime ProxySQL Statistics'
         self.pstats = ProxysqlStats(DB_CS)
+
+    def onStart(self):
+        title_bar = 'ProxyTop - Realtime ProxySQL Statistics'
         self.addForm("MAIN", ConnPoolForm, name=title_bar)
         self.addForm("QSTAT", QueryRulesForm, name=title_bar)
         self.addForm("GLOB", GlobForm, name=title_bar)
