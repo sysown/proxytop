@@ -1,16 +1,29 @@
 Introduction
 ============
 
-Proxytop is a self contained real time monitoring tool for ProxySQL, a high performance, 
-high availability, protocol aware proxy for MySQL and forks (like Percona Server and MariaDB).  
+Proxytop is a self contained real time monitoring tool for ProxySQL, a high performance,
+high availability, protocol aware proxy for MySQL and forks (like Percona Server and MariaDB).
 
 ### How to install:
 
+Proxytop works with either MySQL-python (MySQLdb), which is attempted first, or PyMySQL. For
+MySQLdb, you may first need to install system Python and MySQL dev packages, followed by
+MySQL-python. E.g.:
 ```
-## You may first need to install system Python and MySQL dev packages 
-## e.g. "sudo apt install python-dev libmysqlclient-dev"
-pip install MySQL-python npyscreen
+sudo apt install python-dev libmysqlclient-dev
+pip install MySQL-python
+```
+
+PyMySQL is simply:
+```
+pip install PyMySQL
+```
+
+Finally, install npyscreen (used for the interface) and proxytop itself:
+```
+pip install npyscreen
 wget -P /usr/bin https://raw.githubusercontent.com/sysown/proxytop/master/proxytop
+# or curl -o /usr/bin/proxytop https://raw.githubusercontent.com/sysown/proxytop/master/proxytop
 ```
 
 ### How to run:
@@ -22,15 +35,18 @@ $ proxytop
 
 The script supports connecting to a non-default confication using command line parameters:
 ```
-usage: proxytop [-h] [-H HOST] [-P PORT] [-u USER] [-p PASSWORD] [-f DFILE]
+usage: proxytop [-h] [-H HOST] [-P PORT] [-s SOCKET] [-u USER] [-p PASSWORD]
+                [-f DFILE]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -H HOST, --host HOST  ProxySQL hostname / IP address (default=127.0.0.1)
-  -P PORT, --port PORT  ProxySQL Admin port (default=6032)
-  -u USER, --user USER  ProxySQL Admin username (default=admin)
+  -H HOST, --host HOST  ProxySQL hostname / IP address
+  -P PORT, --port PORT  ProxySQL Admin port
+  -s SOCKET, --socket SOCKET
+                        ProxySQL Admin socket
+  -u USER, --user USER  ProxySQL Admin username
   -p PASSWORD, --password PASSWORD
-                        ProxySQL Admin password (default=admin)
+                        ProxySQL Admin password
   -f DFILE, --dfile DFILE
                         Use the MySQL defaults file specified (expects a
                         [proxysqladmin] group)

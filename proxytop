@@ -3,7 +3,12 @@
 import curses
 import argparse
 import npyscreen
-import MySQLdb
+
+try:
+    import MySQLdb as mysql
+except ImportError:
+    import pymysql as mysql
+
 import sys
 import time
 
@@ -15,41 +20,48 @@ def get_params():
                         default='127.0.0.1',type=str)
     parser.add_argument('-P','--port', help='ProxySQL Admin port',
                         default=6032,type=int)
+    parser.add_argument('-s','--socket', help='ProxySQL Admin socket',
+                        default='',type=str)
     parser.add_argument('-u','--user', help='ProxySQL Admin username',
                         default='admin',type=str)
     parser.add_argument('-p','--password', help='ProxySQL Admin password',
                         default='admin',type=str)
     parser.add_argument('-f','--dfile', help='Use the MySQL defaults file specified (expects a [proxysqladmin] group)',
                         default=None, type=str)
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    if args.socket and  args.host != '127.0.0.1':
+        parser.error('only one of -H/--host or -s/--socket should be specified')
+
+    return args
 
 ### ProxySQL Admin Access Class
 
 class ProxysqlStats(object):
     def __init__(self, cs):
         self.cs = cs
-        self.cursor, self.conn, self.error = self.get_pa_cursor(host=cs.host, port=cs.port, 
-                                                                user=cs.user, password=cs.password,
-                                                                dfile=cs.dfile)
+        self.cursor, self.conn, self.error = self.get_pa_cursor()
 
-    def get_pa_cursor(self, host='127.0.0.1', port=6032, user='admin', password='admin', dfile=None, timeout=60):
+    def get_pa_cursor(self):
         "Connects to ProxySQL's Admin module and returns a DictCursor"
         conn = None
         cursor = None
         error = None
         try:
-            if dfile is None:
-                conn = MySQLdb.connect(host=host,
-                                       port=port,
-                                       user=user,
-                                       passwd=password,
-                                       connect_timeout=timeout)
+            if self.cs.dfile is None:
+                conn = mysql.connect(host=self.cs.host,
+                                     port=self.cs.port,
+                                     unix_socket=self.cs.socket,
+                                     user=self.cs.user,
+                                     passwd=self.cs.password,
+                                     connect_timeout=60)
             else:
-                conn = MySQLdb.connect(host=host,
-                                       port=port,
-                                       read_default_file=dfile,
-                                       read_default_group='proxysqladmin',
-                                       connect_timeout=timeout)
+                conn = mysql.connect(host=self.cs.host,
+                                     port=self.cs.port,
+                                     unix_socket=self.cs.socket,
+                                     read_default_file=self.cs.dfile,
+                                     read_default_group='proxysqladmin',
+                                     connect_timeout=60)
             conn.autocommit(True)
             cursor = conn.cursor()
         except Exception as e:
@@ -83,9 +95,7 @@ class ProxysqlStats(object):
             else:
                 raise Exception('Hmm... connection seems to have been lost')
         except Exception as e:
-            self.cursor, self.conn, self.error = self.get_pa_cursor(host=self.cs.host, port=self.cs.port, 
-                                                                    user=self.cs.user, password=self.cs.password,
-                                                                    dfile=self.cs.dfile)
+            self.cursor, self.conn, self.error = self.get_pa_cursor()
             time.sleep(1)
             return '- N/A'
 
@@ -112,9 +122,7 @@ class ProxysqlStats(object):
             else:
                 raise Exception('Hmm... connection seems to have been lost')
         except Exception as e:
-            self.cursor, self.conn, self.error = self.get_pa_cursor(host=self.cs.host, port=self.cs.port, 
-                                                                    user=self.cs.user, password=self.cs.password,
-                                                                    dfile=self.cs.dfile)
+            self.cursor, self.conn, self.error = self.get_pa_cursor()
             time.sleep(1)
             return ['','{}: {}'.format('CRITICAL ERROR', self.error)]
 
@@ -166,9 +174,7 @@ class ProxysqlStats(object):
             else:
                 raise Exception('Hmm... connection seems to have been lost')
         except Exception as e:
-            self.cursor, self.conn, self.error = self.get_pa_cursor(host=self.cs.host, port=self.cs.port, 
-                                                                    user=self.cs.user, password=self.cs.password,
-                                                                    dfile=self.cs.dfile)
+            self.cursor, self.conn, self.error = self.get_pa_cursor()
             time.sleep(1)
             return ['','{}: {}'.format('CRITICAL ERROR', self.error)]
 
@@ -193,9 +199,7 @@ class ProxysqlStats(object):
             else:
                 raise Exception('Hmm... connection seems to have been lost')
         except Exception as e:
-            self.cursor, self.conn, self.error = self.get_pa_cursor(host=self.cs.host, port=self.cs.port, 
-                                                                    user=self.cs.user, password=self.cs.password,
-                                                                    dfile=self.cs.dfile)
+            self.cursor, self.conn, self.error = self.get_pa_cursor()
             time.sleep(1)
             return ['','{}: {}'.format('CRITICAL ERROR', self.error)]
 
@@ -224,9 +228,7 @@ class ProxysqlStats(object):
             else:
                 raise Exception('Hmm... connection seems to have been lost')
         except Exception as e:
-            self.cursor, self.conn, self.error = self.get_pa_cursor(host=self.cs.host, port=self.cs.port, 
-                                                                    user=self.cs.user, password=self.cs.password,
-                                                                    dfile=self.cs.dfile)
+            self.cursor, self.conn, self.error = self.get_pa_cursor()
             time.sleep(1)
             return ['','{}: {}'.format('CRITICAL ERROR', self.error)]
 
@@ -247,9 +249,7 @@ class ProxysqlStats(object):
             else:
                 raise Exception('Hmm... connection seems to have been lost')
         except Exception as e:
-            self.cursor, self.conn, self.error = self.get_pa_cursor(host=self.cs.host, port=self.cs.port, 
-                                                                    user=self.cs.user, password=self.cs.password,
-                                                                    dfile=self.cs.dfile)
+            self.cursor, self.conn, self.error = self.get_pa_cursor()
             time.sleep(1)
             return ['','{}: {}'.format('CRITICAL ERROR', self.error)]
 
@@ -267,9 +267,7 @@ class ProxysqlStats(object):
             else:
                 raise Exception('Hmm... connection seems to have been lost')
         except Exception as e:
-            self.cursor, self.conn, self.error = self.get_pa_cursor(host=self.cs.host, port=self.cs.port, 
-                                                                    user=self.cs.user, password=self.cs.password,
-                                                                    dfile=self.cs.dfile)
+            self.cursor, self.conn, self.error = self.get_pa_cursor()
             time.sleep(1)
             return '- N/A'
 
@@ -293,9 +291,7 @@ class ProxysqlStats(object):
             else:
                 raise Exception('Hmm... connection seems to have been lost')
         except Exception as e:
-            self.cursor, self.conn, self.error = self.get_pa_cursor(host=self.cs.host, port=self.cs.port, 
-                                                                    user=self.cs.user, password=self.cs.password,
-                                                                    dfile=self.cs.dfile)
+            self.cursor, self.conn, self.error = self.get_pa_cursor()
             time.sleep(1)
             return '- N/A'
 
