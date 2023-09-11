@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "proxytop"
+version = "1.0.0"
+description = ""
+authors = ["Grégory Duchatelet <skygreg@gmail.com>"]
+packages = [
+    { include = "proxytop.py" }
+]
+
+[tool.poetry.scripts]
+proxytop = "proxytop:main"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+mysqlclient = "^2.2.0"
+npyscreen = "^4.10.5"
+
+[tool.poetry.dev-dependencies]
+pre-commit = "*"
+black = "*"
+
