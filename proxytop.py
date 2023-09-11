@@ -535,8 +535,10 @@ class MainApp(npyscreen.NPSAppManaged):
         self.addForm("PROC", ProcForm, name=title_bar)
         self.addForm("COMC", ComForm, name=title_bar)
 
-if __name__ == '__main__':
+def main():
     App = MainApp()
     App.run()
 
 
+if __name__ == '__main__':
+    pass
